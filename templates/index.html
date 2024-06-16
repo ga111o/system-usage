@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Usage</title>
+    <style>
+      .container {
+        display: flex;
+        justify-content: space-between;
+      }
+      .chart-container {
+        width: 24%; /* 4개의 그래프를 한 행에 배치하기 위해 24%로 설정 */
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <h1>System Usage</h1>
+    <div class="container">
+      <div class="chart-container">
+        <canvas id="cpuChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="ramChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="gpuChart"></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas id="vramChart"></canvas>
+      </div>
+    </div>
+    <script>
+      var cpuChartCtx = document.getElementById("cpuChart").getContext("2d");
+      var ramChartCtx = document.getElementById("ramChart").getContext("2d");
+      var gpuChartCtx = document.getElementById("gpuChart").getContext("2d");
+      var vramChartCtx = document.getElementById("vramChart").getContext("2d");
+
+      var cpuChart = new Chart(cpuChartCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "CPU Usage (%)",
+              data: [],
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+              fill: false,
+            },
+          ],
+        },
+      });
+
+      var ramChart = new Chart(ramChartCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "RAM Usage (%)",
+              data: [],
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+              fill: false,
+            },
+          ],
+        },
+      });
+
+      var gpuChart = new Chart(gpuChartCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "GPU Usage (%)",
+              data: [],
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+              fill: false,
+            },
+          ],
+        },
+      });
+
+      var vramChart = new Chart(vramChartCtx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "VRAM Usage (%)",
+              data: [],
+              borderColor: "rgba(75, 192, 192, 1)",
+              borderWidth: 1,
+              fill: false,
+            },
+          ],
+        },
+      });
+
+      function addData(chart, label, data) {
+        chart.data.labels.push(label);
+        chart.data.datasets.forEach((dataset) => {
+          dataset.data.push(data);
+        });
+        chart.update();
+      }
+
+      function fetchData() {
+        fetch("/usage")
+          .then((response) => response.json())
+          .then((data) => {
+            var now = new Date().toLocaleTimeString();
+            addData(cpuChart, now, data.cpu_usage);
+            addData(ramChart, now, data.ram_usage);
+            addData(gpuChart, now, data.gpu_usage);
+            addData(vramChart, now, data.vram_usage);
+          });
+      }
+
+      setInterval(fetchData, 1000);
+    </script>
+  </body>
+</html>
