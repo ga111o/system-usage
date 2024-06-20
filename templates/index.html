@@ -11,6 +11,7 @@
       }
       .chart-container {
         width: 24%;
+        height: 300px;
       }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -106,6 +107,13 @@
         chart.data.datasets.forEach((dataset) => {
           dataset.data.push(data);
         });
+        if (chart.data.labels.length > 50) {
+          chart.data.labels.shift();
+          chart.data.datasets.forEach((dataset) => {
+            dataset.data.shift();
+          });
+        }
+
         chart.update();
       }
 
